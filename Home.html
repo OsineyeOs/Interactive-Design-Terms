@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Set viewport for responsiveness -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Annotated UI Components Demo (Active Navigation Fixed)</title>
+  <style>
+    /* Global Reset & Box Sizing */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html {
+      scroll-behavior: smooth;
+    }
+    body { 
+      font-family: Arial, sans-serif; 
+      line-height: 1.6; 
+      position: relative; 
+    }
+    /* Ensure sections aren’t hidden beneath the fixed navbar */
+    section[id^="section-"] {
+      scroll-margin-top: 70px;
+    }
+
+    /* -------------------- Active Link Styles -------------------- */
+    /* Apply active styling across all navigation elements */
+    .nav-links a.active,
+    .off-canvas a.active,
+    .scrollspy-nav a.active,
+    .sidebar a.active {
+      font-weight: bold;
+      color: #e91e63 !important;
+    }
+    
+    /* -------------------- Preloader / Loading Spinner -------------------- */
+    #preloader {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(255,255,255,0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    #preloader .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #333;
+      border-radius: 50%;
+      width: 60px; height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    #preloader::after {
+      content: "Preloader / Loading Spinner";
+      position: absolute;
+      bottom: 20px;
+      font-size: 0.9rem;
+      color: #333;
+      background: #ffeb3b;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+    
+    /* -------------------- Navbar, Off-Canvas, Header, & Hero -------------------- */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 50px;
+      background: #333;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 1000;
+    }
+    nav::after {
+      content: "Navbar";
+      background: #ff5722;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      position: absolute;
+      bottom: -25px;
+      left: 20px;
+      font-size: 0.9rem;
+    }
+    .nav-links a {
+      color: #fff;
+      margin-left: 15px;
+      text-decoration: none;
+    }
+    .off-canvas-toggle {
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: inline-block;
+    }
+    .off-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 250px; height: 100vh;
+      background: #444;
+      color: #fff;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+      z-index: 1050;
+      padding: 20px;
+    }
+    .off-canvas.active { transform: translateX(0); }
+    .off-canvas ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 30px;
+    }
+    .off-canvas a {
+      color: #fff;
+      text-decoration: none;
+      display: block;
+      margin: 10px 0;
+    }
+    .off-canvas::after {
+      content: "Off-Canvas Navigation";
+      background: #009688;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      position: absolute;
+      top: 10px; right: 10px;
+      font-size: 0.9rem;
+    }
+    header {
+      margin-top: 50px; /* Offset for navbar */
+      background: #f0f0f0;
+      text-align: center;
+      padding: 20px;
+      border-bottom: 2px dashed #ccc;
+      position: relative;
+    }
+    header::after {
+      content: "Header";
+      background: #4caf50;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      position: absolute;
+      bottom: 5px; right: 5px;
+      font-size: 0.9rem;
+    }
+    .hero {
+      height: 300px;
+      background: url('hero-image.jpg') center/cover no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      position: relative;
+      text-align: center;
+    }
+    .hero::after {
+      content: "Hero Section (Above the Fold)";
+      background: #2196f3;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      position: absolute;
+      top: 10px; right: 10px;
+      font-size: 0.9rem;
+    }
+    
+    /* -------------------- Container, Sidebar, & Scrollspy Navigation -------------------- */
+    .container {
+      display: flex;
+      padding: 20px;
+      flex-wrap: wrap;
+      position: relative;
+      margin-top: 20px;
+    }
+    .container::before {
+      content: "Container";
+      background: #9c27b0;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.9rem;
+    }
+    .sidebar {
+      width: 250px;
+      background: #e0e0e0;
+      padding: 15px;
+      position: relative;
+      margin-right: 20px;
+    }
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+    .sidebar a {
+      color: #333;
+      text-decoration: none;
+      display: block;
+      margin: 10px 0;
+    }
+    .sidebar::after {
+      content: "Sidebar";
+      background: #ff9800;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    .scrollspy-nav {
+      position: fixed;
+      top: 60px;
+      right: 0;
+      background: #eee;
+      padding: 10px;
+      border: 1px solid #ccc;
+      z-index: 1200;
+    }
+    .scrollspy-nav a {
+      display: block;
+      margin: 5px 0;
+      color: #333;
+      text-decoration: none;
+    }
+    
+    /* -------------------- Footer -------------------- */
+    footer {
+      background: #333;
+      color: #fff;
+      text-align: center;
+      padding: 15px;
+      position: relative;
+      margin-top: 20px;
+    }
+    footer::after {
+      content: "Footer";
+      background: #f44336;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      display: inline-block;
+      margin-left: 10px;
+    }
+    
+    /* -------------------- Component Demos -------------------- */
+    /* Card & Hover Effect */
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 15px;
+      margin: 10px;
+      width: 200px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+    .card::after {
+      content: "Card";
+      background: #3f51b5;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: 5px; left: 5px;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .card:hover::before {
+      content: "Hover Effect";
+      background: #795548;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      bottom: 5px; right: 5px;
+    }
+    
+    /* Flip Card */
+    .flip-card {
+      background-color: transparent;
+      width: 200px;
+      height: 200px;
+      perspective: 1000px;
+      margin: 10px;
+      position: relative;
+    }
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+      transition: transform 0.8s;
+      transform-style: preserve-3d;
+    }
+    .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+    .flip-card::after {
+      content: "Flip Card (Flips)";
+      background: #e91e63;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: 5px; left: 5px;
+      z-index: 1;
+    }
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .flip-card-front { background: #fff; }
+    .flip-card-back { background: #f1f1f1; transform: rotateY(180deg); }
+    
+    /* Modal (Popup) */
+    .modal { 
+      display: none; 
+      position: fixed; 
+      z-index: 1500; 
+      left: 0; top: 0; 
+      width: 100%; height: 100%; 
+      overflow: auto; 
+      background-color: rgba(0,0,0,0.4); 
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
+      position: relative;
+      border-radius: 4px;
+    }
+    .modal::after {
+      content: "Modal (Popup)";
+      background: #9c27b0;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: 10px; right: 10px;
+    }
+    .close-modal {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close-modal:hover { color: #000; }
+    
+    /* Tooltip */
+    .tooltip {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      margin: 10px;
+    }
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 140px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -70px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 0.8rem;
+    }
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+    .tooltip::after {
+      content: "Tooltip";
+      background: #009688;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: -25px;
+      right: 0;
+    }
+    
+    /* Carousel (Slider) */
+    .carousel {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      overflow: hidden;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .carousel-slides {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+    .carousel-slide {
+      min-width: 100%;
+      height: 300px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+    .carousel::after {
+      content: "Carousel (Slider)";
+      background: #3f51b5;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      z-index: 1;
+    }
+    .carousel-nav {
+      position: absolute;
+      top: 50%;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+    .carousel-nav button {
+      background: rgba(0,0,0,0.5);
+      border: none;
+      color: #fff;
+      padding: 10px;
+      cursor: pointer;
+    }
+    
+    /* Accordion */
+    .accordion {
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+    }
+    .accordion-item {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      position: relative;
+    }
+    .accordion-item::after {
+      content: "Accordion";
+      background: #ff5722;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: 5px;
+      left: 5px;
+    }
+    .accordion-header {
+      background: #f7f7f7;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding: 0 10px;
+    }
+    .accordion-item.active .accordion-content {
+      max-height: 200px;
+      padding: 10px;
+    }
+    
+    /* Parallax Scrolling */
+    .parallax {
+      height: 300px;
+      background-image: url('parallax.jpg');
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      position: relative;
+    }
+    .parallax::after {
+      content: "Parallax Scrolling";
+      background: #9c27b0;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
+    
+    /* Microinteractions */
+    .micro-btn {
+      padding: 10px 20px;
+      background: #607d8b;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin: 10px;
+      position: relative;
+    }
+    .micro-btn:hover { background: #455a64; }
+    .micro-btn::after {
+      content: "Microinteractions";
+      background: #795548;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: -25px;
+      right: 0;
+    }
+    
+    /* Infinite Scroll */
+    .infinite-scroll {
+      width: 100%;
+      max-width: 600px;
+      margin: 20px auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+      position: relative;
+    }
+    .infinite-scroll::after {
+      content: "Infinite Scroll";
+      background: #009688;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: 5px;
+      left: 5px;
+    }
+    .item {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+    .load-more {
+      padding: 10px 20px;
+      margin-top: 10px;
+      background: #607d8b;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    /* Toast Notification / Snackbar */
+    .toast {
+      visibility: hidden;
+      min-width: 250px;
+      background: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 16px;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1500;
+      transition: visibility 0s, opacity 0.5s linear;
+      opacity: 0;
+    }
+    .toast.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    .toast::after {
+      content: "Toast Notification / Snackbar";
+      background: #f44336;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: -25px;
+      right: 0;
+    }
+  </style>
+</head>
+<body>
+  <!-- Preloader / Loading Spinner -->
+  <div id="preloader">
+    <div class="spinner"></div>
+  </div>
+  
+  <!-- Navbar with Off-Canvas Toggle -->
+  <nav>
+    <div class="logo">MyLogo</div>
+    <div class="nav-links">
+      <a href="#section-cards">Cards</a>
+      <a href="#section-flipcard">Flip Card</a>
+      <a href="#section-modal">Modal</a>
+      <a href="#section-tooltip">Tooltip</a>
+      <a href="#section-carousel">Carousel</a>
+      <a href="#section-accordion">Accordion</a>
+      <a href="#section-parallax">Parallax</a>
+      <a href="#section-scrollspy">Scrollspy</a>
+      <a href="#section-micro">Micro</a>
+      <a href="#section-infinite">Infinite</a>
+      <a href="#section-toast">Toast</a>
+    </div>
+    <div class="off-canvas-toggle">☰</div>
+  </nav>
+  
+  <!-- Off-Canvas Navigation -->
+  <div class="off-canvas">
+    <ul>
+      <li><a href="#section-cards">Cards</a></li>
+      <li><a href="#section-flipcard">Flip Card</a></li>
+      <li><a href="#section-modal">Modal</a></li>
+      <li><a href="#section-tooltip">Tooltip</a></li>
+      <li><a href="#section-carousel">Carousel</a></li>
+      <li><a href="#section-accordion">Accordion</a></li>
+      <li><a href="#section-parallax">Parallax</a></li>
+      <li><a href="#section-scrollspy">Scrollspy</a></li>
+      <li><a href="#section-micro">Micro</a></li>
+      <li><a href="#section-infinite">Infinite</a></li>
+      <li><a href="#section-toast">Toast</a></li>
+    </ul>
+  </div>
+  
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <h3>Sidebar Menu</h3>
+    <ul>
+      <li><a href="#section-cards">Cards</a></li>
+      <li><a href="#section-flipcard">Flip Card</a></li>
+      <li><a href="#section-modal">Modal</a></li>
+      <li><a href="#section-tooltip">Tooltip</a></li>
+      <li><a href="#section-carousel">Carousel</a></li>
+      <li><a href="#section-accordion">Accordion</a></li>
+      <li><a href="#section-parallax">Parallax</a></li>
+      <li><a href="#section-scrollspy">Scrollspy</a></li>
+      <li><a href="#section-micro">Micro</a></li>
+      <li><a href="#section-infinite">Infinite</a></li>
+      <li><a href="#section-toast">Toast</a></li>
+    </ul>
+  </aside>
+  
+  <!-- Scrollspy Navigation (Fixed Right) -->
+  <div class="scrollspy-nav">
+    <a href="#section-cards">Cards</a>
+    <a href="#section-flipcard">Flip Card</a>
+    <a href="#section-modal">Modal</a>
+    <a href="#section-tooltip">Tooltip</a>
+    <a href="#section-carousel">Carousel</a>
+    <a href="#section-accordion">Accordion</a>
+    <a href="#section-parallax">Parallax</a>
+    <a href="#section-scrollspy">Scrollspy</a>
+    <a href="#section-micro">Micro</a>
+    <a href="#section-infinite">Infinite</a>
+    <a href="#section-toast">Toast</a>
+  </div>
+  
+  <!-- Header -->
+  <header>
+    <h1>Website Header</h1>
+    <p>Your logo, navigation links, and search bar can go here.</p>
+  </header>
+  
+  <!-- Hero Section -->
+  <section class="hero">
+    <h2>Welcome to Our Site!</h2>
+    <p>Captivating headline to grab attention.</p>
+  </section>
+  
+  <!-- Main Content: Components Demo -->
+  <div class="container" id="components-demo">
+    <!-- Components Demo Content -->
+    <section class="content">
+      <!-- Cards with Hover Effect -->
+      <section id="section-cards">
+        <h2>Cards with Hover Effect</h2>
+        <div style="display: flex; flex-wrap: wrap;">
+          <div class="card">
+            <img src="https://via.placeholder.com/180x100" alt="Card Image" style="width: 100%; border-radius: 4px;">
+            <h3>Card Title</h3>
+            <p>Some descriptive text.</p>
+            <button>CTA</button>
+          </div>
+          <div class="card">
+            <img src="https://via.placeholder.com/180x100" alt="Card Image" style="width: 100%; border-radius: 4px;">
+            <h3>Card Title</h3>
+            <p>Some descriptive text.</p>
+            <button>CTA</button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Flip Card -->
+      <section id="section-flipcard">
+        <h2>Flip Card (Flips)</h2>
+        <div class="flip-card">
+          <div class="flip-card-inner">
+            <div class="flip-card-front">Front Side</div>
+            <div class="flip-card-back">Back Side</div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Modal (Popup) -->
+      <section id="section-modal">
+        <h2>Modal (Popup)</h2>
+        <button id="open-modal">Open Modal</button>
+        <div class="modal" id="myModal">
+          <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <p>This is a modal popup content.</p>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Tooltip -->
+      <section id="section-tooltip">
+        <h2>Tooltip</h2>
+        <div class="tooltip">
+          Hover me
+          <span class="tooltiptext">Additional context</span>
+        </div>
+      </section>
+      
+      <!-- Carousel (Slider) -->
+      <section id="section-carousel">
+        <h2>Carousel (Slider)</h2>
+        <div class="carousel">
+          <div class="carousel-slides">
+            <div class="carousel-slide" style="background: url('https://via.placeholder.com/600x300/ff7f7f');"></div>
+            <div class="carousel-slide" style="background: url('https://via.placeholder.com/600x300/7f7fff');"></div>
+            <div class="carousel-slide" style="background: url('https://via.placeholder.com/600x300/7fff7f');"></div>
+          </div>
+          <div class="carousel-nav">
+            <button id="prev-slide">&#10094;</button>
+            <button id="next-slide">&#10095;</button>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Accordion -->
+      <section id="section-accordion">
+        <h2>Accordion</h2>
+        <div class="accordion">
+          <div class="accordion-item">
+            <div class="accordion-header">Accordion Header 1</div>
+            <div class="accordion-content">Accordion Content 1</div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">Accordion Header 2</div>
+            <div class="accordion-content">Accordion Content 2</div>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Parallax Scrolling -->
+      <section id="section-parallax" class="parallax">
+        <!-- Parallax background effect -->
+      </section>
+      
+      <!-- Scrollspy -->
+      <section id="section-scrollspy">
+        <h2>Scrollspy</h2>
+        <p>Scroll down to see the active nav link change in the fixed Scrollspy navigation (on the right).</p>
+        <div style="height: 800px; background: #eee; margin-top: 20px;">
+          <p style="padding: 20px;">Scroll Content Area</p>
+        </div>
+      </section>
+      
+      <!-- Microinteractions -->
+      <section id="section-micro">
+        <h2>Microinteractions</h2>
+        <button class="micro-btn">Hover for Microinteraction</button>
+      </section>
+      
+      <!-- Infinite Scroll -->
+      <section id="section-infinite" class="infinite-scroll">
+        <h2>Infinite Scroll</h2>
+        <div id="infinite-items">
+          <div class="item">Item 1</div>
+          <div class="item">Item 2</div>
+          <div class="item">Item 3</div>
+        </div>
+        <button class="load-more" id="loadMore">Load More</button>
+      </section>
+      
+      <!-- Toast Notification / Snackbar -->
+      <section id="section-toast">
+        <h2>Toast Notification / Snackbar</h2>
+        <button id="showToast">Show Toast</button>
+      </section>
+    </section>
+  </div>
+  
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 MyWebsite. All rights reserved.</p>
+  </footer>
+  
+  <!-- -------------------- Scripts -------------------- -->
+  <script>
+    // Hide Preloader when the window loads
+    window.addEventListener('load', function() {
+      document.getElementById('preloader').style.display = 'none';
+    });
+    
+    // Off-Canvas Toggle
+    document.querySelector('.off-canvas-toggle').addEventListener('click', function() {
+      document.querySelector('.off-canvas').classList.toggle('active');
+    });
+    
+    // Modal Functionality
+    var modal = document.getElementById('myModal');
+    document.getElementById('open-modal').addEventListener('click', function() {
+      modal.style.display = 'block';
+    });
+    document.querySelector('.close-modal').addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+    window.addEventListener('click', function(e) {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+    
+    // Carousel Functionality
+    let slideIndex = 0;
+    const slides = document.querySelector('.carousel-slides');
+    const totalSlides = document.querySelectorAll('.carousel-slide').length;
+    document.getElementById('next-slide').addEventListener('click', function() {
+      slideIndex = (slideIndex + 1) % totalSlides;
+      slides.style.transform = 'translateX(' + (-slideIndex * 100) + '%)';
+    });
+    document.getElementById('prev-slide').addEventListener('click', function() {
+      slideIndex = (slideIndex - 1 + totalSlides) % totalSlides;
+      slides.style.transform = 'translateX(' + (-slideIndex * 100) + '%)';
+    });
+    
+    // Accordion Functionality
+    document.querySelectorAll('.accordion-header').forEach(function(header) {
+      header.addEventListener('click', function() {
+        this.parentElement.classList.toggle('active');
+      });
+    });
+    
+    // Intersection Observer for Scrollspy & Active Link Highlighting
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          // Update active class on all navigation groups
+          document.querySelectorAll('.nav-links a, .off-canvas a, .scrollspy-nav a, .sidebar a').forEach(link => {
+            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { threshold: 0.6 });
+    
+    document.querySelectorAll('section[id^="section-"]').forEach(section => {
+      observer.observe(section);
+    });
+    
+    // Active link update on click for all navigation links
+    document.querySelectorAll('.nav-links a, .off-canvas a, .scrollspy-nav a, .sidebar a').forEach(link => {
+      link.addEventListener('click', function() {
+        // Remove active class from all links in every nav
+        document.querySelectorAll('.nav-links a, .off-canvas a, .scrollspy-nav a, .sidebar a').forEach(l => l.classList.remove('active'));
+        // Add active class to the clicked link
+        this.classList.add('active');
+        // Close off-canvas if open
+        document.querySelector('.off-canvas').classList.remove('active');
+      });
+    });
+    
+    // Infinite Scroll Simulation: Append more items on "Load More" click
+    document.getElementById('loadMore').addEventListener('click', function() {
+      var container = document.getElementById('infinite-items');
+      var currentCount = container.querySelectorAll('.item').length;
+      for (let i = currentCount + 1; i <= currentCount + 3; i++) {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.textContent = 'Item ' + i;
+        container.appendChild(div);
+      }
+    });
+    
+    // Toast Notification Functionality
+    document.getElementById('showToast').addEventListener('click', function() {
+      const toast = document.createElement('div');
+      toast.className = 'toast show';
+      toast.textContent = 'This is a toast notification!';
+      document.body.appendChild(toast);
+      setTimeout(function() {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 500);
+      }, 3000);
+    });
+  </script>
+</body>
+</html>
