@@ -1,186 +1,362 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-EN0L6HM7Q8"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-EN0L6HM7Q8');
-</script>
+  <!-- Google Tag Manager (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-EN0L6HM7Q8"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-EN0L6HM7Q8');
+  </script>
 
   <meta charset="UTF-8" />
   <!-- Set viewport for responsiveness -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Annotated UI Components Demo (Active Navigation Fixed)</title>
+  <title>Annotated UI Components Demo (Sticky Navbar & Combined Navigation)</title>
   <style>
-    /* Global Reset & Box Sizing */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* -------------------- Accessibility: Skip Link & Back-to-Top Button Styles -------------------- */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #3498db;
+      color: #fff;
+      padding: 8px 15px;
+      z-index: 10000;
+      transition: top 0.3s;
+    }
+    .skip-link:focus {
+      top: 0;
+    }
+    .back-to-top {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+      z-index: 1100;
+      transition: opacity 0.3s;
+    }
+    .back-to-top:hover {
+      background: #2980b9;
+    }
+
+    /* -------------------- Global Reset & Box Sizing -------------------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     html {
       scroll-behavior: smooth;
+      scroll-padding-top: 70px;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      background-color: #f4f4f4;
+      color: #333;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      font-size: 16px;
+      font-weight: 400;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-overflow-scrolling: touch;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      -webkit-backface-visibility: hidden;
+      -moz-backface-visibility: hidden;
+      -ms-backface-visibility: hidden;
+      backface-visibility: hidden;
+      -webkit-perspective: 1000;
+      -moz-perspective: 1000;
+      -ms-perspective: 1000;
+      perspective: 1000;
+      -webkit-transform: translate3d(0, 0, 0);
+      -moz-transform: translate3d(0, 0, 0);
+      -ms-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+      -webkit-transform-style: preserve-3d;
+      -moz-transform-style: preserve-3d;
+      -ms-transform-style: preserve-3d;
+      transform-style: preserve-3d;
     }
-    body { 
-      font-family: Arial, sans-serif; 
-      line-height: 1.6; 
-      position: relative; 
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      position: relative;
+      word-wrap: break-word;
+      color: #333;
     }
-    /* Ensure sections aren’t hidden beneath the fixed navbar */
+    /* Ensure sections aren’t hidden beneath the sticky navbar */
     section[id^="section-"] {
       scroll-margin-top: 70px;
     }
-
+    /* -------------------- General Section Styles -------------------- */
+    section {
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: #f9f9f9;
+      border-bottom: 1px solid #eee;
+    }
+    section h2 {
+      margin-bottom: 15px;
+      color: #2c3e50;
+      border-bottom: 2px solid #3498db;
+      padding-bottom: 5px;
+    }
+    /* -------------------- Utility Classes -------------------- */
+    .mt-2 { margin-top: 0.5rem; }
+    .mt-3 { margin-top: 1rem; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-3 { margin-bottom: 1rem; }
     /* -------------------- Active Link Styles -------------------- */
-    /* Apply active styling across all navigation elements */
     .nav-links a.active,
     .off-canvas a.active,
-    .scrollspy-nav a.active,
     .sidebar a.active {
-      font-weight: bold;
-      color: #e91e63 !important;
+      font-weight: 600;
+      color: #3498db !important;
     }
-    
     /* -------------------- Preloader / Loading Spinner -------------------- */
     #preloader {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(255,255,255,0.9);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 2000;
+      transition: opacity 0.2s ease-out, visibility 0s linear 0.2s;
     }
     #preloader .spinner {
       border: 8px solid #f3f3f3;
-      border-top: 8px solid #333;
+      border-top: 8px solid #3498db;
       border-radius: 50%;
-      width: 60px; height: 60px;
-      animation: spin 1s linear infinite;
+      width: 60px;
+      height: 60px;
+      animation: spin 0.8s linear infinite;
     }
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
     #preloader::after {
-      content: "Preloader / Loading Spinner";
+      content: "Loading...";
       position: absolute;
       bottom: 20px;
       font-size: 0.9rem;
-      color: #333;
-      background: #ffeb3b;
+      color: #777;
+      background: #f0f0f0;
       padding: 4px 8px;
       border-radius: 4px;
     }
-    
-    /* -------------------- Navbar, Off-Canvas, Header, & Hero -------------------- */
+    #preloader.hidden {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease-out, visibility 0s linear 0.2s;
+    }
+    /* -------------------- Sticky Navbar -------------------- */
     nav {
       position: fixed;
-      top: 0; left: 0; right: 0;
-      height: 50px;
-      background: #333;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #2c3e50;
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 20px;
       z-index: 1000;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
-    nav::after {
-      content: "Navbar";
-      background: #ff5722;
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      position: absolute;
-      bottom: -25px;
-      left: 20px;
-      font-size: 0.9rem;
+    /* Removed extra annotation for a clean, functional sticky navbar */
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
     }
     .nav-links a {
       color: #fff;
       margin-left: 15px;
       text-decoration: none;
+      transition: color 0.2s;
     }
-    .off-canvas-toggle {
-      font-size: 1.5rem;
+    .nav-links a:hover { color: #f39c12; }
+    /* -------------------- Breadcrumb‑Style Off‑Canvas Toggle Button -------------------- */
+    .breadcrumb-toggle {
+      font-size: 1rem;
       cursor: pointer;
-      display: inline-block;
+      color: #fff;
+      margin-left: 15px;
+      padding: 5px 10px;
+      border: 1px solid #fff;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
     }
+    .breadcrumb-toggle:hover { background-color: rgba(255, 255, 255, 0.2); }
+    /* Use traditional three-lines (hamburger) icon */
+    .breadcrumb-icon {
+      margin-right: 5px;
+      font-size: 1.2rem;
+    }
+    /* -------------------- Sticky Sidebar -------------------- */
+    .sidebar {
+      width: 270px;
+      background: #ecf0f1;
+      padding: 15px;
+      position: sticky;
+      top: 70px;
+      height: fit-content;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .sidebar h3 {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      color: #3498db;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+    .sidebar ul { list-style: none; padding: 0; }
+    .sidebar a {
+      color: #333;
+      text-decoration: none;
+      display: block;
+      padding: 8px 10px;
+      border-radius: 4px;
+      transition: background-color 0.2s, color 0.2s;
+    }
+    .sidebar a:hover { background-color: #d0d3d4; color: #2980b9; }
+    .sidebar::after {
+      content: "Sticky Sidebar";
+      background: #f39c12;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+    /* -------------------- Combined Off‑Canvas Navigation Panel -------------------- */
+    /* This panel (on mobile) contains the same navigation as the Sticky Navbar and Sidebar */
     .off-canvas {
       position: fixed;
-      top: 0; left: 0;
-      width: 250px; height: 100vh;
-      background: #444;
+      top: 0;
+      left: 0; /* slides in from the left */
+      width: 270px;
+      height: 100vh;
+      background: #34495e;
       color: #fff;
       transform: translateX(-100%);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease-in-out;
       z-index: 1050;
       padding: 20px;
     }
     .off-canvas.active { transform: translateX(0); }
+    .off-canvas h3 { margin-bottom: 15px; font-size: 1.2rem; }
     .off-canvas ul {
       list-style: none;
       padding: 0;
-      margin-top: 30px;
+      margin-top: 20px;
     }
     .off-canvas a {
       color: #fff;
       text-decoration: none;
       display: block;
-      margin: 10px 0;
+      padding: 10px 0;
+      border-bottom: 1px solid #4a6583;
+      transition: color 0.2s;
     }
-    .off-canvas::after {
-      content: "Off-Canvas Navigation";
-      background: #009688;
+    .off-canvas a:hover { color: #f39c12; }
+    .close-off-canvas {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 2rem;
+      cursor: pointer;
+      color: #fff;
+    }
+    /* Annotation for the off-canvas panel */
+    #combinedOffcanvas::after {
+      content: "Combined Navigation";
+      background: #16a085;
       color: #fff;
       padding: 4px 8px;
       border-radius: 4px;
-      position: absolute;
-      top: 10px; right: 10px;
       font-size: 0.9rem;
+      position: absolute;
+      bottom: -25px;
+      left: 20px;
     }
+    /* -------------------- Header & Hero -------------------- */
     header {
-      margin-top: 50px; /* Offset for navbar */
-      background: #f0f0f0;
+      margin-top: 60px;
+      background: #ecf0f1;
       text-align: center;
-      padding: 20px;
-      border-bottom: 2px dashed #ccc;
+      padding: 40px 20px;
+      border-bottom: 2px solid #ddd;
       position: relative;
     }
+    header h1 { font-size: 3rem; color: #2c3e50; margin-bottom: 10px; }
+    header p { font-size: 1.2rem; color: #777; }
     header::after {
-      content: "Header";
-      background: #4caf50;
+      content: "Page Header";
+      background: #27ae60;
       color: #fff;
       padding: 4px 8px;
       border-radius: 4px;
       position: absolute;
-      bottom: 5px; right: 5px;
+      bottom: 5px;
+      right: 5px;
       font-size: 0.9rem;
     }
     .hero {
-      height: 300px;
-      background: url('hero-image.jpg') center/cover no-repeat;
+      height: 400px;
+      background: url('https://via.placeholder.com/1200x400/3498db/fff?text=Hero+Image') center/cover no-repeat;
       display: flex;
       align-items: center;
       justify-content: center;
       color: #fff;
       position: relative;
       text-align: center;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
     }
+    .hero h2 { font-size: 3.5rem; margin-bottom: 10px; }
+    .hero p { font-size: 1.4rem; }
     .hero::after {
       content: "Hero Section (Above the Fold)";
-      background: #2196f3;
+      background: #3498db;
       color: #fff;
       padding: 4px 8px;
       border-radius: 4px;
       position: absolute;
-      top: 10px; right: 10px;
+      top: 10px;
+      right: 10px;
       font-size: 0.9rem;
     }
-    
-    /* -------------------- Container, Sidebar, & Scrollspy Navigation -------------------- */
+    /* -------------------- Container -------------------- */
     .container {
       display: flex;
       padding: 20px;
@@ -189,8 +365,8 @@
       margin-top: 20px;
     }
     .container::before {
-      content: "Container";
-      background: #9c27b0;
+      content: "Main Content Container";
+      background: #8e44ad;
       color: #fff;
       padding: 4px 8px;
       border-radius: 4px;
@@ -200,62 +376,20 @@
       transform: translateX(-50%);
       font-size: 0.9rem;
     }
-    .sidebar {
-      width: 250px;
-      background: #e0e0e0;
-      padding: 15px;
-      position: relative;
-      margin-right: 20px;
-    }
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-    .sidebar a {
-      color: #333;
-      text-decoration: none;
-      display: block;
-      margin: 10px 0;
-    }
-    .sidebar::after {
-      content: "Sidebar";
-      background: #ff9800;
-      color: #fff;
-      padding: 4px 8px;
-      border-radius: 4px;
-      display: block;
-      text-align: center;
-      margin-top: 10px;
-      font-size: 0.9rem;
-    }
-    .scrollspy-nav {
-      position: fixed;
-      top: 60px;
-      right: 0;
-      background: #eee;
-      padding: 10px;
-      border: 1px solid #ccc;
-      z-index: 1200;
-    }
-    .scrollspy-nav a {
-      display: block;
-      margin: 5px 0;
-      color: #333;
-      text-decoration: none;
-    }
-    
+    main { flex: 1; padding: 20px; }
     /* -------------------- Footer -------------------- */
     footer {
-      background: #333;
+      background: #2c3e50;
       color: #fff;
       text-align: center;
-      padding: 15px;
+      padding: 20px;
       position: relative;
       margin-top: 20px;
     }
+    footer p { font-size: 1rem; }
     footer::after {
       content: "Footer";
-      background: #f44336;
+      background: #e74c3c;
       color: #fff;
       padding: 4px 8px;
       border-radius: 4px;
@@ -263,49 +397,50 @@
       display: inline-block;
       margin-left: 10px;
     }
-    
     /* -------------------- Component Demos -------------------- */
     /* Card & Hover Effect */
     .card {
       background: #fff;
       border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 15px;
+      border-radius: 8px;
+      padding: 20px;
       margin: 10px;
-      width: 200px;
+      width: 250px;
       transition: transform 0.3s, box-shadow 0.3s;
       position: relative;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
     .card::after {
       content: "Card";
-      background: #3f51b5;
+      background: #3498db;
       color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
-      top: 5px; left: 5px;
+      top: 10px;
+      left: 10px;
     }
     .card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     .card:hover::before {
       content: "Hover Effect";
-      background: #795548;
+      background: #e67e22;
       color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
-      bottom: 5px; right: 5px;
+      bottom: 10px;
+      right: 10px;
     }
-    
     /* Flip Card */
     .flip-card {
       background-color: transparent;
-      width: 200px;
-      height: 200px;
+      width: 250px;
+      height: 250px;
       perspective: 1000px;
       margin: 10px;
       position: relative;
@@ -315,64 +450,76 @@
       width: 100%;
       height: 100%;
       text-align: center;
-      transition: transform 0.8s;
+      transition: transform 0.6s;
       transform-style: preserve-3d;
     }
-    .flip-card:hover .flip-card-inner { transform: rotateY(180deg); }
+    .flip-card:hover .flip-card-inner {
+      transform: rotateY(180deg);
+    }
     .flip-card::after {
-      content: "Flip Card (Flips)";
-      background: #e91e63;
+      content: "Flip Card";
+      background: #9b59b6;
       color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
-      top: 5px; left: 5px;
+      top: 10px;
+      left: 10px;
       z-index: 1;
     }
-    .flip-card-front, .flip-card-back {
+    .flip-card-front,
+    .flip-card-back {
       position: absolute;
       width: 100%;
       height: 100%;
       backface-visibility: hidden;
       border: 1px solid #ddd;
-      border-radius: 4px;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 1.2rem;
     }
-    .flip-card-front { background: #fff; }
-    .flip-card-back { background: #f1f1f1; transform: rotateY(180deg); }
-    
-    /* Modal (Popup) */
-    .modal { 
-      display: none; 
-      position: fixed; 
-      z-index: 1500; 
-      left: 0; top: 0; 
-      width: 100%; height: 100%; 
-      overflow: auto; 
-      background-color: rgba(0,0,0,0.4); 
+    .flip-card-front { background: #fff; color: #2c3e50; }
+    .flip-card-back {
+      background: #3498db;
+      color: #fff;
+      transform: rotateY(180deg);
+    }
+    /* -------------------- Modal (Popup) - Reduced Size -------------------- */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1500;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
     }
     .modal-content {
       background-color: #fefefe;
       margin: 15% auto;
       padding: 20px;
       border: 1px solid #888;
-      width: 80%;
-      max-width: 500px;
+      width: 90%;
+      max-width: 400px;
       position: relative;
-      border-radius: 4px;
+      border-radius: 8px;
+      text-align: center;
     }
     .modal::after {
       content: "Modal (Popup)";
-      background: #9c27b0;
+      background: #e74c3c;
       color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
-      top: 10px; right: 10px;
+      top: 10px;
+      right: 10px;
     }
     .close-modal {
       color: #aaa;
@@ -382,8 +529,7 @@
       cursor: pointer;
     }
     .close-modal:hover { color: #000; }
-    
-    /* Tooltip */
+    /* -------------------- Tooltip -------------------- */
     .tooltip {
       position: relative;
       display: inline-block;
@@ -392,20 +538,20 @@
     }
     .tooltip .tooltiptext {
       visibility: hidden;
-      width: 140px;
-      background-color: #555;
+      width: 160px;
+      background-color: #333;
       color: #fff;
       text-align: center;
-      border-radius: 4px;
-      padding: 5px;
+      border-radius: 6px;
+      padding: 8px;
       position: absolute;
       z-index: 1;
       bottom: 125%;
       left: 50%;
-      margin-left: -70px;
+      margin-left: -80px;
       opacity: 0;
       transition: opacity 0.3s;
-      font-size: 0.8rem;
+      font-size: 0.9rem;
     }
     .tooltip:hover .tooltiptext {
       visibility: visible;
@@ -413,25 +559,25 @@
     }
     .tooltip::after {
       content: "Tooltip";
-      background: #009688;
+      background: #16a085;
       color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
       top: -25px;
       right: 0;
     }
-    
-    /* Carousel (Slider) */
+    /* -------------------- Carousel (Slider) -------------------- */
     .carousel {
       position: relative;
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
       margin: 20px auto;
       overflow: hidden;
       border: 1px solid #ddd;
-      border-radius: 4px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
     .carousel-slides {
       display: flex;
@@ -439,21 +585,22 @@
     }
     .carousel-slide {
       min-width: 100%;
-      height: 300px;
+      height: 400px;
       background-size: cover;
       background-position: center;
       position: relative;
+      cursor: pointer;
     }
     .carousel::after {
       content: "Carousel (Slider)";
-      background: #3f51b5;
+      background: #3498db;
       color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
-      top: 5px;
-      left: 5px;
+      top: 10px;
+      left: 10px;
       z-index: 1;
     }
     .carousel-nav {
@@ -466,143 +613,165 @@
       z-index: 2;
     }
     .carousel-nav button {
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.5);
       border: none;
       color: #fff;
-      padding: 10px;
+      padding: 10px 15px;
       cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.2s;
     }
-    
-    /* Accordion */
+    .carousel-nav button:hover {
+      background: rgba(0, 0, 0, 0.8);
+    }
+    /* -------------------- Accordion -------------------- */
     .accordion {
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
       margin: 20px auto;
     }
     .accordion-item {
       border: 1px solid #ddd;
-      border-radius: 4px;
+      border-radius: 8px;
       margin-bottom: 10px;
       overflow: hidden;
       position: relative;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
     .accordion-item::after {
       content: "Accordion";
-      background: #ff5722;
+      background: #e67e22;
       color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-size: 0.8rem;
-      position: absolute;
-      top: 5px;
-      left: 5px;
-    }
-    .accordion-header {
-      background: #f7f7f7;
-      padding: 10px;
-      cursor: pointer;
-    }
-    .accordion-content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-      padding: 0 10px;
-    }
-    .accordion-item.active .accordion-content {
-      max-height: 200px;
-      padding: 10px;
-    }
-    
-    /* Parallax Scrolling */
-    .parallax {
-      height: 300px;
-      background-image: url('parallax.jpg');
-      background-attachment: fixed;
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-      position: relative;
-    }
-    .parallax::after {
-      content: "Parallax Scrolling";
-      background: #9c27b0;
-      color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
       top: 10px;
       left: 10px;
     }
-    
-    /* Microinteractions */
+    .accordion-header {
+      background: #f0f0f0;
+      color: #2c3e50;
+      padding: 15px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .accordion-header:hover { background: #e0e0e0; }
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding: 0 15px;
+      font-size: 1rem;
+      color: #555;
+    }
+    .accordion-item.active .accordion-content {
+      max-height: 500px;
+      padding: 15px;
+    }
+    .accordion-header .arrow {
+      transition: transform 0.3s;
+    }
+    .accordion-item.active .accordion-header .arrow {
+      transform: rotate(90deg);
+    }
+    /* -------------------- Parallax Scrolling -------------------- */
+    .parallax {
+      height: 400px;
+      background-image: url('https://via.placeholder.com/1200x400/2ecc71/fff?text=Parallax+Image');
+      background-attachment: fixed;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    .parallax::after {
+      content: "Parallax Scrolling";
+      background: #8e44ad;
+      color: #fff;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      position: absolute;
+      top: 10px;
+      left: 10px;
+    }
+    /* -------------------- Microinteractions -------------------- */
     .micro-btn {
-      padding: 10px 20px;
-      background: #607d8b;
+      padding: 12px 25px;
+      background: #3498db;
       color: #fff;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: transform 0.2s, box-shadow 0.2s;
       margin: 10px;
       position: relative;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
-    .micro-btn:hover { background: #455a64; }
+    .micro-btn:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); }
+    .micro-btn:active { transform: translateY(0); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
     .micro-btn::after {
-      content: "Microinteractions";
-      background: #795548;
-      color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      content: "Microinteraction";
+      background: #f1c40f;
+      color: #2c3e50;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
       top: -25px;
       right: 0;
     }
-    
-    /* Infinite Scroll */
+    /* -------------------- Infinite Scroll -------------------- */
     .infinite-scroll {
       width: 100%;
-      max-width: 600px;
+      max-width: 700px;
       margin: 20px auto;
       border: 1px solid #ddd;
-      padding: 10px;
+      padding: 15px;
       text-align: center;
       position: relative;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
     .infinite-scroll::after {
       content: "Infinite Scroll";
-      background: #009688;
+      background: #2ecc71;
       color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
-      top: 5px;
-      left: 5px;
+      top: 10px;
+      left: 10px;
     }
     .item {
-      padding: 10px;
+      padding: 15px;
       border-bottom: 1px solid #ccc;
+      font-size: 1.1rem;
     }
     .load-more {
-      padding: 10px 20px;
-      margin-top: 10px;
-      background: #607d8b;
+      padding: 12px 25px;
+      margin-top: 15px;
+      background: #3498db;
       color: #fff;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
-    
-    /* Toast Notification / Snackbar */
+    .load-more:hover { background: #2980b9; }
+    /* -------------------- Toast Notification / Snackbar -------------------- */
     .toast {
       visibility: hidden;
-      min-width: 250px;
+      min-width: 280px;
       background: #333;
       color: #fff;
       text-align: center;
-      border-radius: 4px;
+      border-radius: 6px;
       padding: 16px;
       position: fixed;
       bottom: 30px;
@@ -617,27 +786,50 @@
       opacity: 1;
     }
     .toast::after {
-      content: "Toast Notification / Snackbar";
-      background: #f44336;
+      content: "Toast Notification";
+      background: #e74c3c;
       color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
+      padding: 4px 8px;
+      border-radius: 4px;
       font-size: 0.8rem;
       position: absolute;
       top: -25px;
       right: 0;
     }
+    /* -------------------- Media Queries for Responsiveness -------------------- */
+    @media (min-width: 768px) {
+      .container { flex-direction: row; }
+      main { padding: 20px; }
+    }
+    @media (max-width: 767.98px) {
+      .nav-links { display: none; }
+      .container { flex-direction: column; }
+      .sidebar {
+        width: 100%;
+        margin-bottom: 20px;
+        position: static;
+      }
+    }
+    @media (max-width: 575.98px) {
+      .hero h2 { font-size: 2.5rem; }
+      .hero p { font-size: 1.1rem; }
+    }
   </style>
 </head>
 <body>
+  <!-- Skip to main content link (visible on focus) -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- Preloader / Loading Spinner -->
   <div id="preloader">
     <div class="spinner"></div>
+    <p style="position: absolute; bottom: 50px; font-size: 0.9rem; color: #777;">Press 'ESC' to exit</p>
   </div>
-  
-  <!-- Navbar with Off-Canvas Toggle -->
-  <nav>
-    <div class="logo">MyLogo</div>
+  <button id="preloader-toggle" style="display:none;">Toggle Preloader</button>
+
+  <!-- Sticky Navbar with Navigation & Breadcrumb‑Style Off‑Canvas Toggle -->
+  <nav role="navigation" aria-label="Main Navigation">
+    <div class="logo">UI Components Demo</div>
     <div class="nav-links">
       <a href="#section-cards">Cards</a>
       <a href="#section-flipcard">Flip Card</a>
@@ -646,16 +838,21 @@
       <a href="#section-carousel">Carousel</a>
       <a href="#section-accordion">Accordion</a>
       <a href="#section-parallax">Parallax</a>
-      <a href="#section-scrollspy">Scrollspy</a>
-      <a href="#section-micro">Micro</a>
-      <a href="#section-infinite">Infinite</a>
+      <a href="#section-microinteractions">Microinteractions</a>
+      <a href="#section-infinitescroll">Infinite Scroll</a>
       <a href="#section-toast">Toast</a>
     </div>
-    <div class="off-canvas-toggle">☰</div>
+    <!-- Breadcrumb‑Style Off‑Canvas Toggle Button using Three‑Lines (Hamburger) Icon -->
+    <div class="breadcrumb-toggle" aria-label="Open Breadcrumb Navigation">
+      <span class="breadcrumb-icon">&#9776;</span>
+      <span class="breadcrumb-label">Hamburger</span>
+    </div>
   </nav>
-  
-  <!-- Off-Canvas Navigation -->
-  <div class="off-canvas">
+
+  <!-- Combined Off‑Canvas Navigation Panel (same navigation as Navbar & Sidebar) -->
+  <div id="combinedOffcanvas" class="off-canvas" role="navigation" aria-label="Combined Navigation">
+    <span class="close-off-canvas" aria-label="Close Navigation">&times;</span>
+    <h3>Navigation</h3>
     <ul>
       <li><a href="#section-cards">Cards</a></li>
       <li><a href="#section-flipcard">Flip Card</a></li>
@@ -664,84 +861,59 @@
       <li><a href="#section-carousel">Carousel</a></li>
       <li><a href="#section-accordion">Accordion</a></li>
       <li><a href="#section-parallax">Parallax</a></li>
-      <li><a href="#section-scrollspy">Scrollspy</a></li>
-      <li><a href="#section-micro">Micro</a></li>
-      <li><a href="#section-infinite">Infinite</a></li>
+      <li><a href="#section-microinteractions">Microinteractions</a></li>
+      <li><a href="#section-infinitescroll">Infinite Scroll</a></li>
       <li><a href="#section-toast">Toast</a></li>
     </ul>
   </div>
-  
-  <!-- Sidebar Navigation -->
-  <aside class="sidebar">
-    <h3>Sidebar Menu</h3>
-    <ul>
-      <li><a href="#section-cards">Cards</a></li>
-      <li><a href="#section-flipcard">Flip Card</a></li>
-      <li><a href="#section-modal">Modal</a></li>
-      <li><a href="#section-tooltip">Tooltip</a></li>
-      <li><a href="#section-carousel">Carousel</a></li>
-      <li><a href="#section-accordion">Accordion</a></li>
-      <li><a href="#section-parallax">Parallax</a></li>
-      <li><a href="#section-scrollspy">Scrollspy</a></li>
-      <li><a href="#section-micro">Micro</a></li>
-      <li><a href="#section-infinite">Infinite</a></li>
-      <li><a href="#section-toast">Toast</a></li>
-    </ul>
-  </aside>
-  
-  <!-- Scrollspy Navigation (Fixed Right) -->
-  <div class="scrollspy-nav">
-    <a href="#section-cards">Cards</a>
-    <a href="#section-flipcard">Flip Card</a>
-    <a href="#section-modal">Modal</a>
-    <a href="#section-tooltip">Tooltip</a>
-    <a href="#section-carousel">Carousel</a>
-    <a href="#section-accordion">Accordion</a>
-    <a href="#section-parallax">Parallax</a>
-    <a href="#section-scrollspy">Scrollspy</a>
-    <a href="#section-micro">Micro</a>
-    <a href="#section-infinite">Infinite</a>
-    <a href="#section-toast">Toast</a>
-  </div>
-  
+
   <!-- Header -->
   <header>
-    <h1>Website Header</h1>
-    <p>Your logo, navigation links, and search bar can go here.</p>
+    <h1>Explore UI Components</h1>
+    <p>A showcase of interactive web elements and design patterns.</p>
   </header>
-  
+
   <!-- Hero Section -->
-  <section class="hero">
-    <h2>Welcome to Our Site!</h2>
-    <p>Captivating headline to grab attention.</p>
-  </section>
-  
-  <!-- Main Content: Components Demo -->
-  <div class="container" id="components-demo">
-    <!-- Components Demo Content -->
-    <section class="content">
-      <!-- Cards with Hover Effect -->
+  <div class="hero">
+    <h2>Interactive UI Demos</h2>
+    <p>Discover and experiment with various components to enhance your web projects.</p>
+  </div>
+
+  <!-- Main Content Container -->
+  <div class="container">
+    <!-- Sticky Sidebar -->
+    <aside class="sidebar" aria-label="Sidebar Navigation">
+      <h3>Sections</h3>
+      <ul>
+        <li><a href="#section-cards">Cards</a></li>
+        <li><a href="#section-flipcard">Flip Card</a></li>
+        <li><a href="#section-modal">Modal</a></li>
+        <li><a href="#section-tooltip">Tooltip</a></li>
+        <li><a href="#section-carousel">Carousel</a></li>
+        <li><a href="#section-accordion">Accordion</a></li>
+        <li><a href="#section-parallax">Parallax</a></li>
+        <li><a href="#section-microinteractions">Microinteractions</a></li>
+        <li><a href="#section-infinitescroll">Infinite Scroll</a></li>
+        <li><a href="#section-toast">Toast</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main id="main-content">
+      <!-- Cards Section -->
       <section id="section-cards">
-        <h2>Cards with Hover Effect</h2>
-        <div style="display: flex; flex-wrap: wrap;">
-          <div class="card">
-            <img src="https://via.placeholder.com/180x100" alt="Card Image" style="width: 100%; border-radius: 4px;">
-            <h3>Card Title</h3>
-            <p>Some descriptive text.</p>
-            <button>CTA</button>
-          </div>
-          <div class="card">
-            <img src="https://via.placeholder.com/180x100" alt="Card Image" style="width: 100%; border-radius: 4px;">
-            <h3>Card Title</h3>
-            <p>Some descriptive text.</p>
-            <button>CTA</button>
-          </div>
+        <h2>Cards</h2>
+        <p>A flexible container for grouping content.</p>
+        <div class="card">
+          <h3>Sample Card</h3>
+          <p>This is a basic card component. Customize it to suit your needs.</p>
         </div>
       </section>
-      
-      <!-- Flip Card -->
+
+      <!-- Flip Card Section -->
       <section id="section-flipcard">
-        <h2>Flip Card (Flips)</h2>
+        <h2>Flip Card</h2>
+        <p>A card that animates to reveal additional content on hover.</p>
         <div class="flip-card">
           <div class="flip-card-inner">
             <div class="flip-card-front">Front Side</div>
@@ -749,200 +921,253 @@
           </div>
         </div>
       </section>
-      
-      <!-- Modal (Popup) -->
+
+      <!-- Modal Section -->
       <section id="section-modal">
         <h2>Modal (Popup)</h2>
-        <button id="open-modal">Open Modal</button>
-        <div class="modal" id="myModal">
+        <p>A dialog box that appears on top of the current page.</p>
+        <button id="openModalBtn">Open Modal</button>
+        <div id="myModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
           <div class="modal-content">
-            <span class="close-modal">&times;</span>
-            <p>This is a modal popup content.</p>
+            <span class="close-modal" aria-label="Close Modal">&times;</span>
+            <!-- Placeholder message -->
+            <p id="modalTitle">This is a placeholder modal message.</p>
           </div>
         </div>
       </section>
-      
-      <!-- Tooltip -->
+
+      <!-- Tooltip Section -->
       <section id="section-tooltip">
         <h2>Tooltip</h2>
-        <div class="tooltip">
-          Hover me
-          <span class="tooltiptext">Additional context</span>
+        <p>A small pop-up box that appears when the user hovers over an element.</p>
+        <div class="tooltip">Hover over me
+          <span class="tooltiptext">Tooltip Text</span>
         </div>
       </section>
-      
-      <!-- Carousel (Slider) -->
+
+      <!-- Carousel Section -->
       <section id="section-carousel">
         <h2>Carousel (Slider)</h2>
+        <p>A slideshow for cycling through a series of content.</p>
         <div class="carousel">
           <div class="carousel-slides">
-            <div class="carousel-slide" style="background: url('https://via.placeholder.com/600x300/ff7f7f');"></div>
-            <div class="carousel-slide" style="background: url('https://via.placeholder.com/600x300/7f7fff');"></div>
-            <div class="carousel-slide" style="background: url('https://via.placeholder.com/600x300/7fff7f');"></div>
+            <div class="carousel-slide" style="background-image: url('https://via.placeholder.com/1200x400/3498db/fff?text=Slide+1');"></div>
+            <div class="carousel-slide" style="background-image: url('https://via.placeholder.com/1200x400/2ecc71/fff?text=Slide+2');"></div>
+            <div class="carousel-slide" style="background-image: url('https://via.placeholder.com/1200x400/e74c3c/fff?text=Slide+3');"></div>
           </div>
           <div class="carousel-nav">
-            <button id="prev-slide">&#10094;</button>
-            <button id="next-slide">&#10095;</button>
+            <button onclick="prevSlide()">&#10094;</button>
+            <button onclick="nextSlide()">&#10095;</button>
           </div>
         </div>
       </section>
-      
-      <!-- Accordion -->
+
+      <!-- Accordion Section -->
       <section id="section-accordion">
         <h2>Accordion</h2>
+        <p>A vertically stacked set of headers that can be clicked to reveal or hide content.</p>
         <div class="accordion">
           <div class="accordion-item">
-            <div class="accordion-header">Accordion Header 1</div>
-            <div class="accordion-content">Accordion Content 1</div>
+            <div class="accordion-header">
+              Section 1 <div class="arrow">&#9660;</div>
+            </div>
+            <div class="accordion-content">
+              <p>Content for Section 1 goes here.</p>
+            </div>
           </div>
           <div class="accordion-item">
-            <div class="accordion-header">Accordion Header 2</div>
-            <div class="accordion-content">Accordion Content 2</div>
+            <div class="accordion-header">
+              Section 2 <div class="arrow">&#9660;</div>
+            </div>
+            <div class="accordion-content">
+              <p>Content for Section 2 goes here.</p>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <div class="accordion-header">
+              Section 3 <div class="arrow">&#9660;</div>
+            </div>
+            <div class="accordion-content">
+              <p>Content for Section 3 goes here.</p>
+            </div>
           </div>
         </div>
       </section>
-      
-      <!-- Parallax Scrolling -->
-      <section id="section-parallax" class="parallax">
-        <!-- Parallax background effect -->
+
+      <!-- Parallax Section -->
+      <section id="section-parallax">
+        <h2>Parallax</h2>
+        <p>A scrolling effect that creates an illusion of depth.</p>
+        <div class="parallax"></div>
       </section>
-      
-      <!-- Scrollspy -->
-      <section id="section-scrollspy">
-        <h2>Scrollspy</h2>
-        <p>Scroll down to see the active nav link change in the fixed Scrollspy navigation (on the right).</p>
-        <div style="height: 800px; background: #eee; margin-top: 20px;">
-          <p style="padding: 20px;">Scroll Content Area</p>
-        </div>
-      </section>
-      
-      <!-- Microinteractions -->
-      <section id="section-micro">
+
+      <!-- Microinteractions Section -->
+      <section id="section-microinteractions">
         <h2>Microinteractions</h2>
-        <button class="micro-btn">Hover for Microinteraction</button>
+        <p>Subtle animations that provide feedback to user actions.</p>
+        <button class="micro-btn">Click Me</button>
       </section>
-      
-      <!-- Infinite Scroll -->
-      <section id="section-infinite" class="infinite-scroll">
+
+      <!-- Infinite Scroll Section -->
+      <section id="section-infinitescroll">
         <h2>Infinite Scroll</h2>
-        <div id="infinite-items">
+        <p>Load more content as the user scrolls down the page.</p>
+        <div class="infinite-scroll">
           <div class="item">Item 1</div>
           <div class="item">Item 2</div>
           <div class="item">Item 3</div>
+          <div class="item">Item 4</div>
+          <div class="item">Item 5</div>
+          <div class="item">Item 6</div>
+          <div class="item">Item 7</div>
+          <div class="item">Item 8</div>
+          <div class="item">Item 9</div>
+          <div class="item">Item 10</div>
+          <div class="item">Item 11</div>
+          <div class="item">Item 12</div>
+          <button class="load-more">Load More</button>
         </div>
-        <button class="load-more" id="loadMore">Load More</button>
       </section>
-      
-      <!-- Toast Notification / Snackbar -->
+
+      <!-- Toast Section -->
       <section id="section-toast">
         <h2>Toast Notification / Snackbar</h2>
-        <button id="showToast">Show Toast</button>
+        <p>A small message that appears at the bottom of the screen.</p>
+        <button onclick="showToast()">Show Toast</button>
+        <div id="toast" class="toast">Toast Message</div>
       </section>
-    </section>
+    </main>
   </div>
-  
-  <!-- Footer -->
+
   <footer>
-    <p>&copy; 2025 MyWebsite. All rights reserved.</p>
+    <p>&copy; 2025 UI Components Demo</p>
   </footer>
-  
-  <!-- -------------------- Scripts -------------------- -->
+
+  <!-- Back to Top Button -->
+  <button id="backToTop" class="back-to-top" aria-label="Back to Top">↑ Top</button>
+
+  <!-- Inline JavaScript for Interactivity -->
   <script>
-    // Hide Preloader when the window loads
-    window.addEventListener('load', function() {
-      document.getElementById('preloader').style.display = 'none';
+    // Preloader: Auto-hide after 2 seconds and reveal the toggle button after load
+    window.addEventListener('load', function () {
+      document.getElementById('preloader-toggle').style.display = 'block';
+      setTimeout(function () {
+        document.getElementById('preloader').classList.add('hidden');
+      }, 2000);
     });
-    
-    // Off-Canvas Toggle
-    document.querySelector('.off-canvas-toggle').addEventListener('click', function() {
-      document.querySelector('.off-canvas').classList.toggle('active');
+
+    // Combined Off‑Canvas Navigation Toggle (opens when breadcrumb-toggle is clicked)
+    var breadcrumbToggle = document.querySelector('.breadcrumb-toggle');
+    var combinedOffcanvas = document.getElementById('combinedOffcanvas');
+    var closeOffcanvas = document.querySelector('#combinedOffcanvas .close-off-canvas');
+    if (breadcrumbToggle) {
+      breadcrumbToggle.addEventListener('click', function () {
+        combinedOffcanvas.classList.add('active');
+      });
+    }
+    if (closeOffcanvas) {
+      closeOffcanvas.addEventListener('click', function () {
+        combinedOffcanvas.classList.remove('active');
+      });
+    }
+    // Close off-canvas when any link is clicked
+    document.querySelectorAll('#combinedOffcanvas a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        combinedOffcanvas.classList.remove('active');
+      });
     });
-    
+
     // Modal Functionality
     var modal = document.getElementById('myModal');
-    document.getElementById('open-modal').addEventListener('click', function() {
-      modal.style.display = 'block';
-    });
-    document.querySelector('.close-modal').addEventListener('click', function() {
-      modal.style.display = 'none';
-    });
-    window.addEventListener('click', function(e) {
-      if (e.target === modal) {
+    var openModalBtn = document.getElementById('openModalBtn');
+    var modalCloseBtn = document.querySelector('#myModal .close-modal');
+    if (openModalBtn) {
+      openModalBtn.addEventListener('click', function () {
+        modal.style.display = 'block';
+      });
+    }
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener('click', function () {
         modal.style.display = 'none';
-      }
+      });
+    }
+    window.addEventListener('click', function (event) {
+      if (event.target === modal) { modal.style.display = 'none'; }
     });
-    
+
     // Carousel Functionality
-    let slideIndex = 0;
-    const slides = document.querySelector('.carousel-slides');
-    const totalSlides = document.querySelectorAll('.carousel-slide').length;
-    document.getElementById('next-slide').addEventListener('click', function() {
-      slideIndex = (slideIndex + 1) % totalSlides;
-      slides.style.transform = 'translateX(' + (-slideIndex * 100) + '%)';
-    });
-    document.getElementById('prev-slide').addEventListener('click', function() {
-      slideIndex = (slideIndex - 1 + totalSlides) % totalSlides;
-      slides.style.transform = 'translateX(' + (-slideIndex * 100) + '%)';
-    });
-    
+    var currentSlide = 0;
+    var slides = document.querySelectorAll('.carousel-slide');
+    var totalSlides = slides.length;
+    function updateCarousel() {
+      var carouselSlides = document.querySelector('.carousel-slides');
+      carouselSlides.style.transform = 'translateX(' + (-currentSlide * 100) + '%)';
+    }
+    window.nextSlide = function () {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateCarousel();
+    }
+    window.prevSlide = function () {
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateCarousel();
+    }
+
     // Accordion Functionality
-    document.querySelectorAll('.accordion-header').forEach(function(header) {
-      header.addEventListener('click', function() {
-        this.parentElement.classList.toggle('active');
+    document.querySelectorAll('.accordion-header').forEach(function (header) {
+      header.addEventListener('click', function () {
+        var accordionItem = this.parentElement;
+        accordionItem.classList.toggle('active');
       });
     });
-    
-    // Intersection Observer for Scrollspy & Active Link Highlighting
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.getAttribute('id');
-          // Update active class on all navigation groups
-          document.querySelectorAll('.nav-links a, .off-canvas a, .scrollspy-nav a, .sidebar a').forEach(link => {
-            link.classList.toggle('active', link.getAttribute('href') === '#' + id);
-          });
+
+    // Toast Notification Functionality
+    window.showToast = function () {
+      var toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(function () { toast.classList.remove('show'); }, 3000);
+    };
+
+    // Load More Functionality for Infinite Scroll
+    var loadMoreButton = document.querySelector('.load-more');
+    if (loadMoreButton) {
+      loadMoreButton.addEventListener('click', function () {
+        var infiniteScroll = document.querySelector('.infinite-scroll');
+        for (var i = 0; i < 3; i++) {
+          var newItem = document.createElement('div');
+          newItem.className = 'item';
+          var count = infiniteScroll.querySelectorAll('.item').length + 1;
+          newItem.textContent = 'Item ' + count;
+          infiniteScroll.insertBefore(newItem, loadMoreButton);
         }
       });
-    }, { threshold: 0.6 });
-    
-    document.querySelectorAll('section[id^="section-"]').forEach(section => {
-      observer.observe(section);
-    });
-    
-    // Active link update on click for all navigation links
-    document.querySelectorAll('.nav-links a, .off-canvas a, .scrollspy-nav a, .sidebar a').forEach(link => {
-      link.addEventListener('click', function() {
-        // Remove active class from all links in every nav
-        document.querySelectorAll('.nav-links a, .off-canvas a, .scrollspy-nav a, .sidebar a').forEach(l => l.classList.remove('active'));
-        // Add active class to the clicked link
-        this.classList.add('active');
-        // Close off-canvas if open
-        document.querySelector('.off-canvas').classList.remove('active');
+    }
+
+    // Preloader Toggle Button (for manual testing)
+    var preloaderToggle = document.getElementById('preloader-toggle');
+    if (preloaderToggle) {
+      preloaderToggle.addEventListener('click', function () {
+        document.getElementById('preloader').classList.toggle('hidden');
       });
-    });
-    
-    // Infinite Scroll Simulation: Append more items on "Load More" click
-    document.getElementById('loadMore').addEventListener('click', function() {
-      var container = document.getElementById('infinite-items');
-      var currentCount = container.querySelectorAll('.item').length;
-      for (let i = currentCount + 1; i <= currentCount + 3; i++) {
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.textContent = 'Item ' + i;
-        container.appendChild(div);
+    }
+
+    // Hide Preloader on 'Escape' key press
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        document.getElementById('preloader').classList.add('hidden');
       }
     });
-    
-    // Toast Notification Functionality
-    document.getElementById('showToast').addEventListener('click', function() {
-      const toast = document.createElement('div');
-      toast.className = 'toast show';
-      toast.textContent = 'This is a toast notification!';
-      document.body.appendChild(toast);
-      setTimeout(function() {
-        toast.classList.remove('show');
-        setTimeout(() => toast.remove(), 500);
-      }, 3000);
+
+    // Back-to-Top Button Functionality
+    var backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', function () {
+      if (window.pageYOffset > 300) {
+        backToTop.style.display = 'block';
+      } else {
+        backToTop.style.display = 'none';
+      }
+    });
+    backToTop.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
 </body>
